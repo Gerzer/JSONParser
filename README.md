@@ -27,4 +27,4 @@ let word = parser[arrayAt: "array"]?[1, as: String.self]
 let hello = parser[arrayAt: "array"]?[dictionaryAt: 2]?["hello", as: Int.self]
 ```
 
-JSONParser relies on Swift's robust generic-typing system to provide an **easy, intuitive API** for interacting with JSON data. It has **no external dependencies** and relies solely on `Foundation` APIs, so it **works on Linux and Windows** in addition to the various Apple platforms.
+JSONParser builds on top of Swift's robust generic-typing system to provide an **easy, intuitive API** for interacting with JSON data. It has **no external dependencies** and relies solely on `Foundation` APIs, so it **works on Linux and Windows** in addition to the various Apple platforms.
