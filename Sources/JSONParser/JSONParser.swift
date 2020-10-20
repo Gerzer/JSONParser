@@ -10,6 +10,7 @@ import Foundation
 public protocol JSONParser {
 	
 	associatedtype Key: JSONKey
+	associatedtype InternalCollection: Collection
 	
 	var data: Data { get }
 	
@@ -20,6 +21,7 @@ public protocol JSONParser {
 	
 	func get<Value>(valueAt: Key, as: Value.Type) throws -> Value where Value: JSONValue
 	func get<Value>(dataAt: Key, asCollection: Value.Type) throws -> Data where Value: Collection
+	func parse() throws -> InternalCollection
 	
 }
 
@@ -81,6 +83,14 @@ public struct ArrayJSONParser: JSONParser {
 		return try JSONSerialization.data(withJSONObject: newObject)
 	}
 	
+	public func parse() throws -> some Collection {
+		let object = try JSONSerialization.jsonObject(with: self.data)
+		guard let array = object as? [Any] else {
+			throw JSONError.inavlidData
+		}
+		return array
+	}
+	
 }
 
 public struct DictionaryJSONParser: JSONParser {
@@ -111,6 +121,14 @@ public struct DictionaryJSONParser: JSONParser {
 			throw JSONError.invalidKey
 		}
 		return try JSONSerialization.data(withJSONObject: value)
+	}
+	
+	public func parse() throws -> some Collection {
+		let object = try JSONSerialization.jsonObject(with: self.data)
+		guard let dictionary = object as? [String: Any] else {
+			throw JSONError.inavlidData
+		}
+		return dictionary
 	}
 	
 }
