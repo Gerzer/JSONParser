@@ -64,7 +64,7 @@ public struct ArrayJSONParser: JSONParser {
 			throw JSONError.invalidKey
 		}
 		guard let value = array[key] as? Value else {
-			throw JSONError.inavlidData
+			throw JSONError.invalidType
 		}
 		return value
 	}
@@ -78,7 +78,7 @@ public struct ArrayJSONParser: JSONParser {
 			throw JSONError.invalidKey
 		}
 		guard let newObject = array[key] as? Value else {
-			throw JSONError.inavlidData
+			throw JSONError.invalidType
 		}
 		return try JSONSerialization.data(withJSONObject: newObject)
 	}
@@ -106,8 +106,11 @@ public struct DictionaryJSONParser: JSONParser {
 		guard let dictionary = object as? [String: Any] else {
 			throw JSONError.inavlidData
 		}
-		guard let value = dictionary[key] as? Value else {
+		guard dictionary.keys.contains(key) else {
 			throw JSONError.invalidKey
+		}
+		guard let value = dictionary[key] as? Value else {
+			throw JSONError.invalidType
 		}
 		return value
 	}
@@ -117,8 +120,11 @@ public struct DictionaryJSONParser: JSONParser {
 		guard let dictionary = object as? [String: Any] else {
 			throw JSONError.inavlidData
 		}
-		guard let value = dictionary[key] as? Value else {
+		guard dictionary.keys.contains(key) else {
 			throw JSONError.invalidKey
+		}
+		guard let value = dictionary[key] as? Value else {
+			throw JSONError.invalidType
 		}
 		return try JSONSerialization.data(withJSONObject: value)
 	}
