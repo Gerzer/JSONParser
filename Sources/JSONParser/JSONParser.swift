@@ -55,6 +55,13 @@ public struct ArrayJSONParser: JSONParser {
 		self.data = data
 	}
 	
+	init?(_ array: [Any]) {
+		guard let data = try? JSONSerialization.data(withJSONObject: array) else {
+			return nil
+		}
+		self.init(data)
+	}
+	
 	public func get<Value>(valueAt key: Int, as: Value.Type) throws -> Value where Value: JSONValue {
 		let object = try JSONSerialization.jsonObject(with: self.data)
 		guard let array = object as? [Any] else {
@@ -91,6 +98,12 @@ public struct ArrayJSONParser: JSONParser {
 		return array
 	}
 	
+	public func iterate(_ closure: (JSONProxy) throws -> Void) throws {
+		try self.parse().forEach { (element) in
+			try closure(JSONProxy(element))
+		}
+	}
+	
 }
 
 public struct DictionaryJSONParser: JSONParser {
@@ -99,6 +112,13 @@ public struct DictionaryJSONParser: JSONParser {
 	
 	public init(_ data: Data) {
 		self.data = data
+	}
+	
+	init?(_ dictionary: [String: Any]) {
+		guard let data = try? JSONSerialization.data(withJSONObject: dictionary) else {
+			return nil
+		}
+		self.init(data)
 	}
 	
 	public func get<Value>(valueAt key: String, as: Value.Type) throws -> Value where Value: JSONValue {
