@@ -27,7 +27,7 @@ let word = parser[arrayAt: "array"]?[1, as: String.self]
 let hello = parser[arrayAt: "array"]?[dictionaryAt: 2]?["hello", as: Int.self]
 ```
 
-You can also **iterate over heterogenous JSON arrays**:
+You can also **iterate over heterogenous JSON arrays *and* dictionaries**:
 
 ```swift
 try data.arrayParser.iterate { (proxy) in

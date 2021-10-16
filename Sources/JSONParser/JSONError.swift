@@ -12,5 +12,6 @@ enum JSONError: Error {
 	case inavlidData
 	case invalidKey
 	case invalidType
+	case failedIteration
 	
 }

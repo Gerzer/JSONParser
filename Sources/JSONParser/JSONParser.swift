@@ -25,6 +25,12 @@ public protocol JSONParser {
 	
 }
 
+public protocol IterableJSONParser: JSONParser {
+	
+	func iterate(_ closure: (JSONProxy<Key>) throws -> Void) throws
+	
+}
+
 public extension JSONParser {
 	
 	subscript(arrayAt key: Key) -> ArrayJSONParser? {
@@ -47,7 +53,7 @@ public extension JSONParser {
 	
 }
 
-public struct ArrayJSONParser: JSONParser {
+public struct ArrayJSONParser: IterableJSONParser {
 	
 	public let data: Data
 	
@@ -90,7 +96,7 @@ public struct ArrayJSONParser: JSONParser {
 		return try JSONSerialization.data(withJSONObject: newObject)
 	}
 	
-	public func parse() throws -> some Collection {
+	public func parse() throws -> [Any] {
 		let object = try JSONSerialization.jsonObject(with: self.data)
 		guard let array = object as? [Any] else {
 			throw JSONError.inavlidData
@@ -98,15 +104,17 @@ public struct ArrayJSONParser: JSONParser {
 		return array
 	}
 	
-	public func iterate(_ closure: (JSONProxy) throws -> Void) throws {
-		try self.parse().forEach { (element) in
-			try closure(JSONProxy(element))
-		}
+	public func iterate(_ closure: (JSONProxy<Int>) throws -> Void) throws {
+		try self.parse()
+			.enumerated()
+			.forEach { (key, value) in
+				try closure(JSONProxy(key: key, value: value))
+			}
 	}
 	
 }
 
-public struct DictionaryJSONParser: JSONParser {
+public struct DictionaryJSONParser: IterableJSONParser {
 	
 	public let data: Data
 	
@@ -149,12 +157,19 @@ public struct DictionaryJSONParser: JSONParser {
 		return try JSONSerialization.data(withJSONObject: value)
 	}
 	
-	public func parse() throws -> some Collection {
+	public func parse() throws -> [String: Any] {
 		let object = try JSONSerialization.jsonObject(with: self.data)
 		guard let dictionary = object as? [String: Any] else {
 			throw JSONError.inavlidData
 		}
 		return dictionary
+	}
+	
+	public func iterate(_ closure: (JSONProxy<String>) throws -> Void) throws {
+		try self.parse()
+			.forEach { (key, value) in
+				try closure(JSONProxy(key: key, value: value))
+			}
 	}
 	
 }

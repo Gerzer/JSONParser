@@ -7,8 +7,9 @@
 
 import Foundation
 
-public struct JSONProxy {
+public struct JSONProxy<Key> where Key: JSONKey {
 	
+	public let key: Key
 	private let value: Any
 	public var arrayParser: ArrayJSONParser? {
 		get {
@@ -27,12 +28,17 @@ public struct JSONProxy {
 		}
 	}
 	
-	init(_ value: Any) {
+	init(key: Key, value: Any) {
+		self.key = key
 		self.value = value
 	}
 	
 	public func get<Value>(as _: Value.Type) -> Value? where Value: JSONValue {
 		return self.value as? Value
+	}
+	
+	public func get<Value>(as _: Value.Type) -> (Key, Value?) where Value: JSONValue {
+		return (key: self.key, value: self.value as? Value)
 	}
 	
 }

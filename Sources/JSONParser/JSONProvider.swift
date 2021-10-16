@@ -20,6 +20,12 @@ public protocol JSONProvider {
 	
 }
 
+public protocol IterableJSONProvider: JSONProvider {
+	
+	func iterate(_ closure: (JSONProxy<Key>) throws -> Void) throws
+	
+}
+
 public extension JSONProvider {
 	
 	subscript(arrayAt key: Key) -> ArrayJSONParser? {
@@ -42,15 +48,29 @@ public extension JSONProvider {
 	
 }
 
-public extension JSONProvider where InternalJSONParser == ArrayJSONParser {
+public extension IterableJSONProvider where InternalJSONParser == ArrayJSONParser {
 	
-	func iterate(_ closure: (JSONProxy) throws -> Void) throws {
-		try self.parser?.iterate(closure)
+	func iterate(_ closure: (JSONProxy<Int>) throws -> Void) throws {
+		guard let parser = self.parser else {
+			throw JSONError.failedIteration
+		}
+		try parser.iterate(closure)
 	}
 	
 }
 
-public struct ArrayData: JSONProvider {
+public extension IterableJSONProvider where InternalJSONParser == DictionaryJSONParser {
+	
+	func iterate(_ closure: (JSONProxy<String>) throws -> Void) throws {
+		guard let parser = self.parser else {
+			throw JSONError.failedIteration
+		}
+		try parser.iterate(closure)
+	}
+	
+}
+
+public struct ArrayData: IterableJSONProvider {
 	
 	let data: Data
 	public var parser: ArrayJSONParser? {
@@ -65,7 +85,7 @@ public struct ArrayData: JSONProvider {
 	
 }
 
-public struct DictionaryData: JSONProvider {
+public struct DictionaryData: IterableJSONProvider {
 	
 	private let data: Data
 	public var parser: DictionaryJSONParser? {
@@ -105,7 +125,7 @@ public extension Data {
 	
 }
 
-extension Array: JSONProvider {
+extension Array: IterableJSONProvider {
 	
 	public var parser: ArrayJSONParser? {
 		get {
@@ -118,7 +138,7 @@ extension Array: JSONProvider {
 	
 }
 
-extension Dictionary: JSONProvider where Key == String {
+extension Dictionary: JSONProvider, IterableJSONProvider where Key == String {
 	
 	public var parser: DictionaryJSONParser? {
 		get {
@@ -131,7 +151,7 @@ extension Dictionary: JSONProvider where Key == String {
 	
 }
 
-extension Set: JSONProvider {
+extension Set: IterableJSONProvider {
 	
 	public var parser: ArrayJSONParser? {
 		get {
