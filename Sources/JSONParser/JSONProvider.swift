@@ -42,6 +42,14 @@ public extension JSONProvider {
 	
 }
 
+public extension JSONProvider where InternalJSONParser == ArrayJSONParser {
+	
+	func iterate(_ closure: (JSONProxy) throws -> Void) throws {
+		try self.parser?.iterate(closure)
+	}
+	
+}
+
 public struct ArrayData: JSONProvider {
 	
 	let data: Data
@@ -118,6 +126,16 @@ extension Dictionary: JSONProvider where Key == String {
 				return nil
 			}
 			return DictionaryJSONParser(data)
+		}
+	}
+	
+}
+
+extension Set: JSONProvider {
+	
+	public var parser: ArrayJSONParser? {
+		get {
+			return Array(self).parser
 		}
 	}
 	
