@@ -16,11 +16,23 @@ let package = Package(
 			targets: [
 				"JSONParser"
 			]
+		),
+		.executable(
+			name: "Tester",
+			targets: [
+				"Tester"
+			]
 		)
 	],
 	targets: [
 		.target(
 			name: "JSONParser"
+		),
+		.target(
+			name: "Tester",
+			dependencies: [
+				"JSONParser"
+			]
 		)
 	]
 )
